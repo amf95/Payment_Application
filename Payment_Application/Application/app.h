@@ -1,4 +1,4 @@
-/*
+*/*
 
 Auther: Ahmed Mahmoud Fawzy.
 Creation Date: 15-10-2022 Sat 10:30 AM.
@@ -10,13 +10,9 @@ task: Implement the application.
 
 */
 
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef APP_H
+#define APP_H
 
-#include "../modules/config.h"
-#include "../modules/newTypes.h"
-
-void loadTestValues(client_t *taget, client_t *source, char *testCase);
 void appStart();
 
 #endif
