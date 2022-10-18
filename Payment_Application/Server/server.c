@@ -15,84 +15,50 @@ task: Implement the server module.
 
 */
 
+#ifndef SERVER_H
+#define SERVER_H
+
 #include "../Card/card.h"
 #include "../Terminal/terminal.h"
-#include "server.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <stdint.h>
 
-int clientIndex = 0;
-
-ST_accountsDB_t accountsDB[ACCOUNTS_DB_SIZE + 1] = {
-    {.primaryAccountNumber = "1111111111111111", .balance = 50000},
-    {.primaryAccountNumber = "2222222222222222", .balance = 50000},
-    {.primaryAccountNumber = "3333333333333333", .balance = 3000},
-    {.primaryAccountNumber = "4444444444444444", .balance = 1000}
-    }; 
-
-ST_transaction_t transactionsDB[TRANSACTIONS_DB_SIZE + 1] = {0};
+#define ACCOUNTS_DB_SIZE 255
+#define TRANSACTIONS_DB_SIZE 255
+#define PAN_MAX_SIZE 19
+#define LOG_FILE_PATH "./logs/logs.txt"
 
 
-EN_transState_t recieveTransactionData(ST_transaction_t *transData){
-    // update balance.
-    accountsDB[clientIndex].balance -= clientInfo.balance;
-}
 
-EN_serverError_t isValidAccount(ST_cardData_t *cardData){
-    for(int i=0; i<= ACCOUNTS_DB_SIZE; i++){
-        if(strcmp(cardData->primaryAccountNumber, accountsDB[i].primaryAccountNumber) == 0){
-            return OK;
-        }
-    }
-    return DECLINED_STOLEN_CARD;
-}
+typedef enum EN_transState_t
+{
+    APPROVED, DECLINED_INSUFFECIENT_FUND, DECLINED_STOLEN_CARD, INTERNAL_SERVER_ERROR
+}EN_transState_t;
 
-EN_serverError_t isAmountAvailable(ST_trminalData_t *termData){
-    if(termData->transAmount <= accountsDB[clientIndex].balance){
-        return OK;
-    }
-    else{
-        return LOW_BALANCE;
-    }  
-}
-
-EN_serverError_t saveTransaction(ST_transaction_t *transData){
-     
-    //save data to logs.txt file.
-    FILE *logFile;
-    logFile = fopen(LOG_FILE_PATH, "a");
-    
-    if(logFile != NULL){    
-        // get transaction date.
-        char date[50];
-        time_t now = time(NULL);
-        struct tm *localTime = localtime(&now);
-        strftime(date, 50, "%Y-%m-%d %H:%M:%S", localTime);
-
-        char log[LOG_SIZE];
-
-        snprintf(log, LOG_SIZE, 
-        "{ name: \"%s\", pan: \"%s\", date: \"%s\",  balance: %f, withdraw: %f }\n",
-        clientInfo.holderName, clientInfo.PAN, date,
-        accountsDB[clientIndex].balance, clientInfo.balance);
-
-        fputs(log, logFile);
-          
-        fclose(logFile);
-        return OK;       
-    }
-    else{
-        fclose(logFile);
-        return SAVING_FAILED;
-    }
-}
+typedef enum EN_serverError_t
+{
+    OK, SAVING_FAILED, TRANSACTION_NOT_FOUND, ACCOUNT_NOT_FOUND, LOW_BALANCE
+}EN_serverError_t ;
 
 
-void printClientInfo(){
-    printf("{ Name: \"%s\", PAN: %s, Month: %d, Year: %d, Available Balance: %f }\n\n",
-    accountsDB[clientIndex].holderName, accountsDB[clientIndex].PAN,
-    accountsDB[clientIndex].expiryMonth, accountsDB[clientIndex].expiryYear,
-    accountsDB[clientIndex].balance);
-}
+typedef struct ST_transaction_t
+{
+    ST_cardData_t cardHolderData;
+    ST_terminalData_t terminalData;
+    EN_transState_t transState;
+    uint32_t transactionSequenceNumber;
+}ST_transaction_t;
+
+typedef struct ST_accountsDB_t
+{
+    float balance;
+    uint8_t primaryAccountNumber[PAN_MAX_SIZE + 1];
+}ST_accountsDB_t;
+
+
+EN_transState_t recieveTransactionData(ST_transaction_t *transData);
+EN_serverError_t isValidAccount(ST_cardData_t *cardData);
+EN_serverError_t isAmountAvailable(ST_terminalData_t *termData);
+EN_serverError_t saveTransaction(ST_transaction_t *transData);
+EN_serverError_t getTransaction(uint32_t transactionSequenceNumber, ST_transaction_t *transData);
+
+#endif
