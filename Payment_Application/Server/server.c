@@ -15,50 +15,111 @@ task: Implement the server module.
 
 */
 
-#ifndef SERVER_H
-#define SERVER_H
-
 #include "../Card/card.h"
 #include "../Terminal/terminal.h"
-#include <stdint.h>
+#include "server.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-#define ACCOUNTS_DB_SIZE 255
-#define TRANSACTIONS_DB_SIZE 255
-#define PAN_MAX_SIZE 19
-#define LOG_FILE_PATH "./logs/logs.txt"
+int sequenceNumber = 0;
+int accountsDBIndex = 0;
 
+ST_accountsDB_t accountsDB[ACCOUNTS_DB_SIZE + 1] = {
+    {.primaryAccountNumber = "1111111111111111", .balance = 50000},
+    {.primaryAccountNumber = "2222222222222222", .balance = 50000},
+    {.primaryAccountNumber = "3333333333333333", .balance = 3000},
+    {.primaryAccountNumber = "4444444444444444", .balance = 1000}
+    }; 
 
-
-typedef enum EN_transState_t
-{
-    APPROVED, DECLINED_INSUFFECIENT_FUND, DECLINED_STOLEN_CARD, INTERNAL_SERVER_ERROR
-}EN_transState_t;
-
-typedef enum EN_serverError_t
-{
-    OK, SAVING_FAILED, TRANSACTION_NOT_FOUND, ACCOUNT_NOT_FOUND, LOW_BALANCE
-}EN_serverError_t ;
-
-
-typedef struct ST_transaction_t
-{
-    ST_cardData_t cardHolderData;
-    ST_terminalData_t terminalData;
-    EN_transState_t transState;
-    uint32_t transactionSequenceNumber;
-}ST_transaction_t;
-
-typedef struct ST_accountsDB_t
-{
-    float balance;
-    uint8_t primaryAccountNumber[PAN_MAX_SIZE + 1];
-}ST_accountsDB_t;
+ST_transaction_t transactionsDB[TRANSACTIONS_DB_SIZE + 1] = {0};
 
 
-EN_transState_t recieveTransactionData(ST_transaction_t *transData);
-EN_serverError_t isValidAccount(ST_cardData_t *cardData);
-EN_serverError_t isAmountAvailable(ST_terminalData_t *termData);
-EN_serverError_t saveTransaction(ST_transaction_t *transData);
-EN_serverError_t getTransaction(uint32_t transactionSequenceNumber, ST_transaction_t *transData);
+EN_transState_t recieveTransactionData(ST_transaction_t *transData){
+    if(isValidAccount(&transData->cardHolderData) == OK){
+        if(isAmountAvailable(&transData->terminalData) == OK){
+            transData->transState = APPROVED;
+        }
+        else{
+            transData->transState = DECLINED_INSUFFECIENT_FUND;
+        }
+    }
+    else{
+        transData->transState = DECLINED_STOLEN_CARD;
+    }
 
-#endif
+    if(saveTransaction(transData) == OK){
+        return transData->transState;
+    }
+    else{
+        return INTERNAL_SERVER_ERROR;
+    }
+}
+
+EN_serverError_t isValidAccount(ST_cardData_t *cardData){
+    for(int i=0; i<= ACCOUNTS_DB_SIZE; i++){
+        if(strcmp(cardData->primaryAccountNumber, 
+        accountsDB[i].primaryAccountNumber) == 0){
+            accountsDBIndex = i;
+            return OK;
+        }
+    }
+    return ACCOUNT_NOT_FOUND;
+}
+
+EN_serverError_t isAmountAvailable(ST_terminalData_t *termData){
+    if(termData->transAmount <= accountsDB[accountsDBIndex].balance){
+        return OK;
+    }
+    else{
+        return LOW_BALANCE;
+    }  
+}
+
+EN_serverError_t saveTransaction(ST_transaction_t *transData){
+    transData->transactionSequenceNumber = sequenceNumber;
+    transactionsDB[sequenceNumber] = *transData;
+    sequenceNumber++;
+    return OK;
+    
+    /*
+    //save data to logs.txt file.
+    FILE *logFile;
+    logFile = fopen(LOG_FILE_PATH, "a");
+    
+    if(logFile != NULL){    
+        // get transaction date.
+        char date[50];
+        time_t now = time(NULL);
+        struct tm *localTime = localtime(&now);
+        strftime(date, 50, "%Y-%m-%d %H:%M:%S", localTime);
+
+        char log[LOG_SIZE];
+
+        snprintf(log, LOG_SIZE, 
+        "{ name: \"%s\", pan: \"%s\", date: \"%s\",  balance: %f, withdraw: %f }\n",
+        clientInfo.holderName, clientInfo.PAN, date,
+        accountsDB[accountsDBIndex].balance, clientInfo.balance);
+
+        fputs(log, logFile);
+          
+        fclose(logFile);
+        return OK;       
+    }
+    else{
+        fclose(logFile);
+        return SAVING_FAILED;
+    }
+    */
+}
+
+
+/*
+void printClientInfo(){
+    printf("{ Name: \"%s\", PAN: %s, Month: %d, Year: %d, Available Balance: %f }\n\n",
+    accountsDB[accountsDBIndex].holderName, accountsDB[accountsDBIndex].PAN,
+    accountsDB[accountsDBIndex].expiryMonth, accountsDB[accountsDBIndex].expiryYear,
+    accountsDB[accountsDBIndex].balance);
+}
+*/
