@@ -19,7 +19,7 @@ task: Implement the card module.
 #include <ctype.h>
 
 EN_cardError_t getCardHolderName(ST_cardData_t *cardData){
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE + 1];
     printf("Please Enter Card Holder Name: ");
     fgets(buffer, sizeof(buffer), stdin);
     buffer[strlen(buffer) - 1] = '\0'; //get rid of '\n' added by fgets()
@@ -27,7 +27,7 @@ EN_cardError_t getCardHolderName(ST_cardData_t *cardData){
     if((buffer != NULL) && (strlen(buffer) >= NAME_MIN_SIZE) && 
     (strlen(buffer) < NAME_MAX_SIZE)){
         strcpy(cardData->cardHolderName, buffer);
-        return OK;
+        return CARD_OK;
     }
     else{
         return WRONG_NAME;
@@ -35,14 +35,14 @@ EN_cardError_t getCardHolderName(ST_cardData_t *cardData){
 }
 
 EN_cardError_t getCardExpiryDate(ST_cardData_t *cardData){
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE + 1];
     printf("Please Enter Card Expiration Date: ");
     fgets(buffer, BUFFER_SIZE, stdin);
     buffer[strlen(buffer) - 1] = '\0'; //get rid of '\n' added by fgets()
 
-    if(isValidDateFormat(buffer) == OK){
+    if(isValidDateFormat(buffer) == CARD_OK){
         strcpy(cardData->cardExpirationDate, buffer);
-        return OK;
+        return CARD_OK;
     }
     else{
         return WRONG_EXP_DATE;
@@ -52,14 +52,14 @@ EN_cardError_t getCardExpiryDate(ST_cardData_t *cardData){
 }
 
 EN_cardError_t getCardPAN(ST_cardData_t *cardData){
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE +1];
     printf("Please Enter Card PAN: ");
     fgets(buffer, BUFFER_SIZE, stdin);
     buffer[strlen(buffer) - 1] = '\0'; //get rid of '\n' added by fgets()
-
-    if(isValidPANFormat(buffer) == OK){
+    
+    if(isValidPANFormat(buffer) == CARD_OK){
         strcpy(cardData->primaryAccountNumber, buffer);
-        return OK;
+        return CARD_OK;
     }
     else{
         return WRONG_PAN;
@@ -68,13 +68,15 @@ EN_cardError_t getCardPAN(ST_cardData_t *cardData){
 
 EN_cardError_t isValidDateFormat(char *date){
     if((date != NULL) && (strlen(date) == EXPIRATION_DATE_SIZE) &&
-    (date[DATE_SEPERATOR_INDEX] == "/")){
-
-        for (int i = 0; i <= strlen(date); i++){
-            if(date[i] == '/')continue;
-            if(!(isdigit(date[i]))) return WRONG_EXP_DATE;
+    (date[DATE_SEPERATOR_INDEX] == '/')){
+        
+        for (int i = 0; i < EXPIRATION_DATE_SIZE; i++){
+            if(date[i] == '/') continue;
+            if(!(isdigit(date[i]))) {
+                return WRONG_EXP_DATE;
+            }
         }
-        return OK;
+        return CARD_OK;
     }
     else{
         return WRONG_EXP_DATE;
@@ -82,12 +84,12 @@ EN_cardError_t isValidDateFormat(char *date){
 }
 
 EN_cardError_t isValidPANFormat(char *PAN){
-    if((PAN != NULL) && (PAN >= PAN_MIN_SIZE) && (PAN <= PAN_MAX_SIZE)){
-    
-        for (int i = 0; i <= strlen(PAN); i++){
+    if((PAN != NULL) && (strlen(PAN) >= PAN_MIN_SIZE) && (strlen(PAN) <= PAN_MAX_SIZE)){
+
+        for (int i = 0; i < strlen(PAN); i++){
             if(!(isdigit(PAN[i]))) return WRONG_PAN;
         }
-        return OK;
+        return CARD_OK;
     }
     else{
         return WRONG_PAN;

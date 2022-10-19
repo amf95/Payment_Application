@@ -17,24 +17,25 @@ task: Implement the terminal module.
 #ifndef TERMINAL_H
 #define TERMINAL_H
 
+
 #include <stdint.h>
 #include "../Card/card.h"
+
 
 #define BUFFER_SIZE 32
 #define TRANSACTION_DATE_SIZE 10
 
 
-
 typedef enum EN_terminalError_t
 {
-OK, WRONG_DATE, EXPIRED_CARD, INVALID_CARD, INVALID_AMOUNT, EXCEED_MAX_AMOUNT, INVALID_MAX_AMOUNT
+    TERM_OK, WRONG_DATE, EXPIRED_CARD, INVALID_CARD, INVALID_AMOUNT, EXCEED_MAX_AMOUNT, INVALID_MAX_AMOUNT
 }EN_terminalError_t ;
 
 typedef struct ST_terminalData_t
 {
-float transAmount;
-float maxTransAmount;
-uint8_t transactionDate[TRANSACTION_DATE_SIZE + 1];
+    float transAmount;
+    float maxTransAmount;
+    uint8_t transactionDate[TRANSACTION_DATE_SIZE + 1];
 }ST_terminalData_t;
 
 EN_terminalError_t getTransactionDate(ST_terminalData_t *termData);

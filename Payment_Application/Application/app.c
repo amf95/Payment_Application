@@ -25,11 +25,13 @@ task: Testing the application
 #include <stdlib.h>
 #include <string.h>
 
+#define NUM_OF_TEST_CASES 5
+
 ST_cardData_t card;
 ST_terminalData_t terminal;
 ST_transaction_t transaction;
 
-ST_transaction_t transactionTestCases[6] = {
+ST_transaction_t transactionTestCases[NUM_OF_TEST_CASES + 1] = {
     {.cardHolderData = 
     {.cardHolderName =  "Ahmed Mohamed Mahmoud",
     .primaryAccountNumber = "1111111111111111", 
@@ -46,14 +48,14 @@ ST_transaction_t transactionTestCases[6] = {
     {.cardHolderName =  "Amr Zein Mohamed Ali",
     .primaryAccountNumber = "3333333333333333", 
     .cardExpirationDate = "03/27"},
-    .terminalData = {.transAmount = 10000} 
+    .terminalData = {.transAmount = 5000} 
     }, // case: 3
 
     {.cardHolderData = 
-    {.cardHolderName =  "Sara Ahmed Mohamed Samir",
+    {.cardHolderName =  "Sara Ahmed Mohamed saad",
     .primaryAccountNumber = "4444444444444444", 
     .cardExpirationDate = "04/21"},
-    .terminalData = {.transAmount = 5000} 
+    .terminalData = {.transAmount = 1000} 
     }, // case: 4
 
     {.cardHolderData = 
@@ -61,34 +63,39 @@ ST_transaction_t transactionTestCases[6] = {
     .primaryAccountNumber = "5555555555555555", 
     .cardExpirationDate = "05/28"},
     .terminalData = {.transAmount = 1000} 
-    }, // case: 3
-    };
+    }, // case: 5
+};
     
-void loadTestValues(ST_cardData_t *cardData, ST_terminalData_t *termData, 
-ST_transaction_t source,char *testCase);
+char testCases[NUM_OF_TEST_CASES + 1][50] = {
+    "1-Transaction approved user story",
+    "2-Exceed the maximum amount user story",
+    "3-Insufficient fund user story",
+    "4-Expired card user story",
+    "5-Invalid card user story"
+};
+
 
 void appStart(){
 
-    terminal.maxTransAmount = 8000;
-    setMaxAmount(&terminal); // max withdraw amount.
+    //terminal.maxTransAmount = 8000;
+    if(setMaxAmount(&terminal) == INVALID_MAX_AMOUNT){ // max withdraw amount.
+        printf("\nTERMINAL: INVALID_MAX_AMOUNT[%2f]!\n", terminal.maxTransAmount);
+        exit(0);
+    }
+
+    printf("\n");
 
     int mode = 0;
     
-    printf(
-    "0-Manual Inputs.\n"
-    "[\"<NAME:[20-24]>\", \"<PAN:[16-19]>\", <DATE:MM/YY>, <MAX_AMOUNT:8000>]\n\n"
-    "1-Transaction approved user story:\n"
-    "[\"Ahmed Mohamed Mahmoud\", \"1111111111111111\", 07/25, 5000]\n\n"
-    "2-Exceed the maximum amount user story:\n"
-    "[\"Mohamed Ali Samy Ibrahim\", \"2222222222222222\", 08/26, 10000]\n\n"
-    "3-Insufficient fund user story:\n"
-    "[\"Amr Zein Mohamed Ali\", \"3333333333333333\", 03/27, 5000]\n\n"
-    "4-Expired card user story:\n"
-    "[\"Sara Ahmed Mohamed Samir\",  \"4444444444444444\", 04/21, 1000]\n\n"
-    "5-Invalid card user story:\n"
-    "[\"Saly Mahmoud\",\"5555555555555555\", 05/28, 1000]\n\n"
-    "Please Enter Test Case Number: ");
+    printf("0-Manual Inputs:\n"
+    "FORMATE: [\"<NAME:[20-24]>\", \"<PAN:[16-19]>\", <DATE:MM/YY>, <AMOUNT>]\n\n");
 
+    printf("\n!!!WARNING :  \"1-5 Test Cases Will Bypass The Card Module\"   : WARNING!!!\n\n");
+    for(int i = 0; i < NUM_OF_TEST_CASES; i++){
+        printTestCases(transactionTestCases[i], testCases[i]);
+    }
+   
+    printf("Please Enter Test Case Number: ");
     scanf("%d", &mode);
     getchar(); // eat away the '\n' left in stdin
 
@@ -98,21 +105,23 @@ void appStart(){
     switch (mode)
     {
         case 0:
-            printf("Please Enter Your Name: ");
             if(getCardHolderName(&card) == WRONG_NAME){
-                printf("WRONG_NAME!\n");
+                printf("\nCARD: WRONG_NAME[%s]!\n", card.cardHolderName);
                 exit(0);
             }
-            printf("Please Enter Expiry Date: ");
+            printf("CARD: NAME_OK!\n");
+
             if(getCardExpiryDate(&card) == WRONG_EXP_DATE){
-                printf("WRONG_EXP_DATE!\n");
+                printf("CARD: WRONG_EXP_DATE[%s]!\n", card.cardExpirationDate);
                 exit(0);
             }
-            printf("Please Enter Card PAN: ");
+            printf("CARD: EXP_DATE_OK!\n");
+
             if(getCardPAN(&card) == WRONG_PAN){
-                printf("WRONG_PAN!\n");
+                printf("\nCARD: WRONG_PAN[%s]!\n", card.primaryAccountNumber);
                 exit(0);
             }
+            printf("CARD: PAN_OK!\n");
             break;
 
         case 1:
@@ -141,23 +150,29 @@ void appStart(){
             break;       
 
         default:
-            printf("Wrong Case!");
+            printf("\nWrong Case!\n");
             exit(0);
             break;
     }
     //------------------------------ End Card Side ------------------------------
     
     //--------------------------- Start Terminal Side ---------------------------
-    if(isCardExpried(&card, &terminal) == EXPIRED_CARD){
-        //printCardInfo(newCard);
-        printf("EXPIRED_CARD!\n");
+    if(!(getTransactionDate(&terminal) == TERM_OK)){
+        printf("\nTERMINAL: WRONG_DATE[%s]!\n", terminal.transactionDate);
         exit(0);
     }
- 
+
+    if(isCardExpired(card, terminal) == EXPIRED_CARD){
+        //printCardInfo(newCard);
+        printf("\nTERMINAL: EXPIRED_CARD[Card:%s ,Now: %s]!\n", 
+        card.cardExpirationDate, terminal.transactionDate);
+        exit(0);
+    }
+    printf("TERMINAL: EXP_DATE_OK!\n");
+
     if(mode == 0){
-        printf("Please Enter Wanted Amount: ");
         if(getTransactionAmount(&terminal) == INVALID_AMOUNT){
-            printf("INVALID_AMOUNT\n");
+            printf("\nTERMINAL: INVALID_AMOUNT[%.2f]\n", terminal.transAmount);
             exit(0); 
         }
     }
@@ -166,42 +181,40 @@ void appStart(){
     //printCardInfo(newCard);
     //printf("\n");
     
-    if(!(isBelowMaxAmount(&terminal) == OK)){
-        printf("EXCEED_MAX_AMOUNT!\n");
+    if(!(isBelowMaxAmount(&terminal) == TERM_OK)){
+        printf("\nTERMINAL: EXCEED_MAX_AMOUNT[%.2f/%.2f]!\n", 
+        terminal.transAmount, terminal.maxTransAmount);
         exit(0);
     }
+    printf("\nTERMINAL: VALID_AMOUNT!\n");
     //----------------------- End Terminal Side -------------------------
         
     //----------------------  Start Server Side -------------------------
     transaction.cardHolderData = card;
     transaction.terminalData = terminal;
-    int transactionState = recieveTransactionData(&transaction);
 
-    switch (transactionState)
+    switch (recieveTransactionData(&transaction))
     {
     case APPROVED:
-        printf("Transaction State: APPROVED!.\n");
+        printf("\nSERVER: APPROVED!.\n");
         break;
     
     case DECLINED_INSUFFECIENT_FUND:
-        printf("Transaction State: DECLINED_INSUFFECIENT_FUND!.\n");
+        printf("\nSERVER: DECLINED_INSUFFECIENT_FUND!.\n\n");
         break;
 
     case DECLINED_STOLEN_CARD:
-        printf("Transaction State: DECLINED_STOLEN_CARD!\n");
+        printf("\nSERVER: DECLINED_STOLEN_CARD!\n\n");
         break;
 
     case INTERNAL_SERVER_ERROR:
-        printf("Transaction State: INTERNAL_SERVER_ERROR!\n");
+        printf("\nSERVER: INTERNAL_SERVER_ERROR!\n\n");
         break;
 
     default:
         break;
     }
     //--------------------------- Server Side ---------------------------
-    
-   
-
 }
 
 
@@ -209,7 +222,27 @@ void appStart(){
 
 void loadTestValues(ST_cardData_t *cardData, ST_terminalData_t *termData, 
 ST_transaction_t source,char *testCase){
-    printf("Loading \"%s\".\n", testCase);
+    printf("Loading \"%s\".\n\n", testCase);
     *cardData = source.cardHolderData;
+    source.terminalData.maxTransAmount = termData->maxTransAmount; //load max amount enterd by user.
     *termData = source.terminalData;
+}
+/*
+"1-Transaction approved user story:\n"
+    "[\"Ahmed Mohamed Mahmoud\", \"1111111111111111\", 07/25, 5000]\n\n"
+
+ {.cardHolderData = 
+    {.cardHolderName =  "Saly Mahmoud Zein Sayed",
+    .primaryAccountNumber = "5555555555555555", 
+    .cardExpirationDate = "05/28"},
+    .terminalData = {.transAmount = 1000} 
+    }, // case: 5
+*/
+void printTestCases(ST_transaction_t transactionCase, char *testCase){
+    printf("%s:\n", testCase);
+    printf("[\"%s\", \"%s\", \"%s\", \"%.1f\"]\n\n",
+    transactionCase.cardHolderData.cardHolderName, 
+    transactionCase.cardHolderData.primaryAccountNumber,
+    transactionCase.cardHolderData.cardExpirationDate,
+    transactionCase.terminalData.transAmount);    
 }

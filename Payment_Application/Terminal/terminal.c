@@ -27,9 +27,9 @@ EN_terminalError_t getTransactionDate(ST_terminalData_t *termData){
     struct tm *localTime = localtime(&now);
     char buffer[BUFFER_SIZE + 1];
     strftime(buffer, BUFFER_SIZE, "%d/%m/%Y", localTime);
-
     if(strlen(buffer) == TRANSACTION_DATE_SIZE){
-        return OK;
+        strcpy(termData->transactionDate, buffer);
+        return TERM_OK;
     }
     else{
         return WRONG_DATE;
@@ -47,11 +47,11 @@ EN_terminalError_t isCardExpired(ST_cardData_t cardData, ST_terminalData_t termD
     int termCurrentYear = atoi(strtok(NULL, seperator));
 
     if((cardExpiryYear > termCurrentYear)){
-        return OK;
+        return TERM_OK;
     }
     else if((cardExpiryYear == termCurrentYear) 
     && (cardExpiryMonth >= termCurrentMonth)){
-        return OK;
+        return TERM_OK;
     }
     else{
         return EXPIRED_CARD;
@@ -66,7 +66,7 @@ EN_terminalError_t getTransactionAmount(ST_terminalData_t *termData){
 
     if(amount > 0.0){
         termData->transAmount = amount;
-        return OK;
+        return TERM_OK;
     }
     else{
         return INVALID_AMOUNT;
@@ -75,7 +75,7 @@ EN_terminalError_t getTransactionAmount(ST_terminalData_t *termData){
 
 EN_terminalError_t isBelowMaxAmount(ST_terminalData_t *termData){
     if(termData->transAmount <= termData->maxTransAmount){
-        return OK;
+        return TERM_OK;
     }
     else{
         return EXCEED_MAX_AMOUNT;
@@ -84,13 +84,13 @@ EN_terminalError_t isBelowMaxAmount(ST_terminalData_t *termData){
 
 EN_terminalError_t setMaxAmount(ST_terminalData_t *termData){
     float amount = 0.0;
-    printf("Please Set Transaction Mac Amount: ");
+    printf("Please Set Transaction Max Amount: ");
     scanf("%f", &amount);
     getchar(); // eat away the '\n' left in stdin
 
     if(amount > 0.0){
         termData->maxTransAmount = amount;
-        return OK;
+        return TERM_OK;
     }
     else{
         return INVALID_MAX_AMOUNT;

@@ -25,9 +25,9 @@ task: Implement the server module.
 #define ACCOUNTS_DB_SIZE 255
 #define TRANSACTIONS_DB_SIZE 255
 #define PAN_MAX_SIZE 19
-#define LOG_FILE_PATH "./logs/logs.txt"
-
-
+#define LOG_FILE_PATH "./Transactions_DB/Transactions_DB.txt"
+#define LOG_SIZE 1024
+#define LINE_MAX_SIZE 1024
 
 typedef enum EN_transState_t
 {
@@ -36,7 +36,7 @@ typedef enum EN_transState_t
 
 typedef enum EN_serverError_t
 {
-    OK, SAVING_FAILED, TRANSACTION_NOT_FOUND, ACCOUNT_NOT_FOUND, LOW_BALANCE
+    SERVER_OK, SAVING_FAILED, TRANSACTION_NOT_FOUND, ACCOUNT_NOT_FOUND, LOW_BALANCE
 }EN_serverError_t ;
 
 

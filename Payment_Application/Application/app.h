@@ -13,6 +13,13 @@ task: Implement the application.
 #ifndef APP_H
 #define APP_H
 
+#include "../Card/card.h"
+#include "../Server/server.h"
+
+void loadTestValues(ST_cardData_t *cardData, ST_terminalData_t *termData, 
+ST_transaction_t source,char *testCase);
+void printTestCases(ST_transaction_t transactionCase, char *testCase);
+
 void appStart();
 
 #endif
