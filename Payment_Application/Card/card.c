@@ -25,7 +25,7 @@ EN_cardError_t getCardHolderName(ST_cardData_t *cardData){
     buffer[strlen(buffer) - 1] = '\0'; //get rid of '\n' added by fgets()
 
     if((buffer != NULL) && (strlen(buffer) >= NAME_MIN_SIZE) && 
-    (strlen(buffer) < NAME_MAX_SIZE)){
+    (strlen(buffer) <= NAME_MAX_SIZE)){
         strcpy(cardData->cardHolderName, buffer);
         return CARD_OK;
     }
@@ -67,33 +67,30 @@ EN_cardError_t getCardPAN(ST_cardData_t *cardData){
 }
 
 EN_cardError_t isValidDateFormat(char *date){
-    if((date != NULL) && (strlen(date) == EXPIRATION_DATE_SIZE) &&
-    (date[DATE_SEPERATOR_INDEX] == '/')){
-        
-        for (int i = 0; i < EXPIRATION_DATE_SIZE; i++){
-            if(date[i] == '/') continue;
-            if(!(isdigit(date[i]))) {
-                return WRONG_EXP_DATE;
-            }
-        }
-        return CARD_OK;
-    }
-    else{
+    if((date == NULL) || (strlen(date) != EXPIRATION_DATE_SIZE) 
+    || (date[DATE_SEPERATOR_INDEX] != '/')){
         return WRONG_EXP_DATE;
     }
+
+    for (int i = 0; i < EXPIRATION_DATE_SIZE; i++){
+        if(date[i] == '/') continue;
+
+        if(!(isdigit(date[i]))) {
+            return WRONG_EXP_DATE;
+        }
+    }
+    return CARD_OK;
 }
 
 EN_cardError_t isValidPANFormat(char *PAN){
-    if((PAN != NULL) && (strlen(PAN) >= PAN_MIN_SIZE) && (strlen(PAN) <= PAN_MAX_SIZE)){
-
-        for (int i = 0; i < strlen(PAN); i++){
-            if(!(isdigit(PAN[i]))) return WRONG_PAN;
-        }
-        return CARD_OK;
-    }
-    else{
+    if((PAN == NULL) || (strlen(PAN) < PAN_MIN_SIZE) 
+    || (strlen(PAN) > PAN_MAX_SIZE)){
         return WRONG_PAN;
     }
+    for (int i = 0; i < strlen(PAN); i++){
+        if(!(isdigit(PAN[i]))) return WRONG_PAN;
+    }
+    return CARD_OK;
 }
 
 

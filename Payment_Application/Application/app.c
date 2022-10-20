@@ -88,7 +88,7 @@ void appStart(){
     int mode = 0;
     
     printf("0-Manual Inputs:\n"
-    "FORMATE: [\"<NAME:[20-24]>\", \"<PAN:[16-19]>\", <DATE:MM/YY>, <AMOUNT>]\n\n");
+    "[<NAME:[20-24]>, <PAN:[16-19]>, <DATE: MM/YY>, <AMOUNT: XXXX>]\n\n");
 
     printf("\n!!!WARNING :  \"1-5 Test Cases Will Bypass The Card Module\"   : WARNING!!!\n\n");
     for(int i = 0; i < NUM_OF_TEST_CASES; i++){
@@ -106,19 +106,19 @@ void appStart(){
     {
         case 0:
             if(getCardHolderName(&card) == WRONG_NAME){
-                printf("\nCARD: WRONG_NAME[%s]!\n", card.cardHolderName);
+                printf("\nCARD: WRONG_NAME!\n");
                 exit(0);
             }
             printf("CARD: NAME_OK!\n");
 
             if(getCardExpiryDate(&card) == WRONG_EXP_DATE){
-                printf("CARD: WRONG_EXP_DATE[%s]!\n", card.cardExpirationDate);
+                printf("CARD: WRONG_EXP_DATE!\n");
                 exit(0);
             }
             printf("CARD: EXP_DATE_OK!\n");
 
             if(getCardPAN(&card) == WRONG_PAN){
-                printf("\nCARD: WRONG_PAN[%s]!\n", card.primaryAccountNumber);
+                printf("\nCARD: WRONG_PAN!\n");
                 exit(0);
             }
             printf("CARD: PAN_OK!\n");

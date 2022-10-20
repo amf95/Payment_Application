@@ -16,10 +16,11 @@ task: Implement the application.
 #include "../Card/card.h"
 #include "../Server/server.h"
 
+void appStart();
+
+//Added Helper Functions.
 void loadTestValues(ST_cardData_t *cardData, ST_terminalData_t *termData, 
 ST_transaction_t source,char *testCase);
 void printTestCases(ST_transaction_t transactionCase, char *testCase);
-
-void appStart();
 
 #endif

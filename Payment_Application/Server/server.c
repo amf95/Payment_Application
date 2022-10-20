@@ -80,6 +80,7 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
     time_t now = time(NULL);
     transData->transactionSequenceNumber = now;
     
+    //save in transactionsDB(Array)
     static int sequenceIndex = 0;
     transactionsDB[sequenceIndex] = *transData;
     if(sequenceIndex < TRANSACTIONS_DB_SIZE - 1) sequenceIndex++;
@@ -90,25 +91,32 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
     
     if(transactions_DB != NULL){    
         // get transaction date.
-        char date[50];
-        struct tm *localTime = localtime(&now);
-        strftime(date, 50, "%Y-%m-%d %H:%M:%S", localTime);
+        //char date[50];
+        //struct tm *localTime = localtime(&now);
+        //strftime(date, 50, "%Y-%m-%d %H:%M:%S", localTime);
 
         char log[LOG_SIZE];
 
+        //manage data formate. 
         snprintf(log, LOG_SIZE, 
-        "%d,%d,%s,%s,%s,%f,%f\n",
-        transData->transactionSequenceNumber, 
-        transData->transState,
-        transData->cardHolderData.cardHolderName,
-        transData->cardHolderData.primaryAccountNumber, 
-        transData->cardHolderData.cardExpirationDate,
-        accountsDB[accountsDBIndex].balance - transData->terminalData.transAmount,
-        transData->terminalData.transAmount);
+            "%d,%s,%f,%d,%.2f,%s,%s,%s\n",
+            transData->transactionSequenceNumber,
+            transData->terminalData.transactionDate,
+            transData->terminalData.transAmount,
+            transData->transState,
+            transData->terminalData.maxTransAmount,
+            transData->cardHolderData.cardHolderName,
+            transData->cardHolderData.primaryAccountNumber,
+            transData->cardHolderData.cardExpirationDate
+        );
 
+        //save in transactions_DB(File).
         fputs(log, transactions_DB);
           
         fclose(transactions_DB);
+
+        listSavedTransactions();
+
         return SERVER_OK;       
     }
     else{
@@ -140,3 +148,42 @@ EN_serverError_t getTransaction(uint32_t transactionSequenceNumber, ST_transacti
     }
 }
 */
+
+void listSavedTransactions(void){
+    for(int i = 0; i <= TRANSACTIONS_DB_SIZE; i++){
+        if(transactionsDB[i].transactionSequenceNumber > 0){
+            char *transState;
+            if(transactionsDB[i].transState == APPROVED) 
+            transState = "APPROVED";
+            if(transactionsDB[i].transState == DECLINED_INSUFFECIENT_FUND) 
+            transState = "DECLINED_INSUFFECIENT_FUND";
+            if(transactionsDB[i].transState == DECLINED_STOLEN_CARD) 
+            transState = "DECLINED_STOLEN_CARD";
+            if(transactionsDB[i].transState == INTERNAL_SERVER_ERROR) 
+            transState = "INTERNAL_SERVER_ERROR";
+
+            printf(
+            "\n#########################\n"
+            "Transaction Sequence Number: %d\n" 
+            "Transaction Date: %s\n"
+            "Transaction Amount: %.2f\n"
+            "Transaction State: %s\n"
+            "Terminal Max Amount: %.2f\n"
+            "Cardholder Name: \"%s\"\n"
+            "PAN: %s\n"
+            "Card Expiration Date: %s\n"
+            "#########################\n\n",
+            transactionsDB[i].transactionSequenceNumber,
+            transactionsDB[i].terminalData.transactionDate,
+            transactionsDB[i].terminalData.transAmount,
+            transState,
+            transactionsDB[i].terminalData.maxTransAmount,
+            transactionsDB[i].cardHolderData.cardHolderName,
+            transactionsDB[i].cardHolderData.primaryAccountNumber,
+            transactionsDB[i].cardHolderData.cardExpirationDate
+            );
+        }
+        
+    }
+    
+}
