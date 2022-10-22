@@ -29,9 +29,7 @@ EN_cardError_t getCardHolderName(ST_cardData_t *cardData){
         strcpy(cardData->cardHolderName, buffer);
         return CARD_OK;
     }
-    else{
-        return WRONG_NAME;
-    }
+    return WRONG_NAME;
 }
 
 EN_cardError_t getCardExpiryDate(ST_cardData_t *cardData){
@@ -44,11 +42,7 @@ EN_cardError_t getCardExpiryDate(ST_cardData_t *cardData){
         strcpy(cardData->cardExpirationDate, buffer);
         return CARD_OK;
     }
-    else{
-        return WRONG_EXP_DATE;
-    }
-
-    
+    return WRONG_EXP_DATE;
 }
 
 EN_cardError_t getCardPAN(ST_cardData_t *cardData){
@@ -61,45 +55,27 @@ EN_cardError_t getCardPAN(ST_cardData_t *cardData){
         strcpy(cardData->primaryAccountNumber, buffer);
         return CARD_OK;
     }
-    else{
-        return WRONG_PAN;
-    }
+    return WRONG_PAN;
 }
 
 EN_cardError_t isValidDateFormat(char *date){
     if((date == NULL) || (strlen(date) != EXPIRATION_DATE_SIZE) 
-    || (date[DATE_SEPERATOR_INDEX] != '/')){
-        return WRONG_EXP_DATE;
-    }
+    || (date[DATE_SEPERATOR_INDEX] != '/')) return WRONG_EXP_DATE;
+
 
     for (int i = 0; i < EXPIRATION_DATE_SIZE; i++){
         if(date[i] == '/') continue;
-
-        if(!(isdigit(date[i]))) {
-            return WRONG_EXP_DATE;
-        }
+        if(!(isdigit(date[i]))) return WRONG_EXP_DATE;
     }
     return CARD_OK;
 }
 
 EN_cardError_t isValidPANFormat(char *PAN){
     if((PAN == NULL) || (strlen(PAN) < PAN_MIN_SIZE) 
-    || (strlen(PAN) > PAN_MAX_SIZE)){
-        return WRONG_PAN;
-    }
+    || (strlen(PAN) > PAN_MAX_SIZE)) return WRONG_PAN;
+
     for (int i = 0; i < strlen(PAN); i++){
         if(!(isdigit(PAN[i]))) return WRONG_PAN;
     }
     return CARD_OK;
 }
-
-
-/*
-void printCardInfo(client_t newCard){
-    printf(
-        "\n---------------------- YOUR CARD/REQUEST INFO ----------------------\n"
-        "\n{ Name: \"%s\", PAN: %s, Month: %d, Year: %d, Amount: %f }\n\n", 
-        newCard.holderName, newCard.PAN, newCard.expiryMonth,
-        newCard.expiryYear, newCard.balance);
-}
-*/

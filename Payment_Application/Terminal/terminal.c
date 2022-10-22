@@ -31,9 +31,7 @@ EN_terminalError_t getTransactionDate(ST_terminalData_t *termData){
         strcpy(termData->transactionDate, buffer);
         return TERM_OK;
     }
-    else{
-        return WRONG_DATE;
-    }
+    return WRONG_DATE;
 }
 
 EN_terminalError_t isCardExpired(ST_cardData_t cardData, ST_terminalData_t termData){
@@ -46,16 +44,11 @@ EN_terminalError_t isCardExpired(ST_cardData_t cardData, ST_terminalData_t termD
     int termCurrentMonth = atoi(strtok(NULL, seperator));
     int termCurrentYear = atoi(strtok(NULL, seperator));
 
-    if((cardExpiryYear > termCurrentYear)){
-        return TERM_OK;
-    }
+    if((cardExpiryYear > termCurrentYear)) return TERM_OK;
     else if((cardExpiryYear == termCurrentYear) 
-    && (cardExpiryMonth >= termCurrentMonth)){
-        return TERM_OK;
-    }
-    else{
-        return EXPIRED_CARD;
-    }
+    && (cardExpiryMonth >= termCurrentMonth)) return TERM_OK;
+
+    return EXPIRED_CARD;
 }
 
 EN_terminalError_t getTransactionAmount(ST_terminalData_t *termData){
@@ -68,9 +61,7 @@ EN_terminalError_t getTransactionAmount(ST_terminalData_t *termData){
         termData->transAmount = amount;
         return TERM_OK;
     }
-    else{
-        return INVALID_AMOUNT;
-    }
+    return INVALID_AMOUNT;
 }
 
 EN_terminalError_t isBelowMaxAmount(ST_terminalData_t *termData){
@@ -92,9 +83,7 @@ EN_terminalError_t setMaxAmount(ST_terminalData_t *termData){
         termData->maxTransAmount = amount;
         return TERM_OK;
     }
-    else{
-        return INVALID_MAX_AMOUNT;
-    }
+    return INVALID_MAX_AMOUNT;
 }
 
 

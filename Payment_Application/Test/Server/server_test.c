@@ -34,3 +34,29 @@ void saveTransactionTest(void){
 void listSavedTransactionsTest(void){
 
 }
+
+
+// added helper functions:
+void printServerTestCaseInfo(char *testerName, char *FunctionName,
+                            char *testCase, char *inputData,
+                            EN_serverError_t expectedResult, 
+                            EN_serverError_t actualResult){
+
+    char expectedResultStr[32], actualResultStr[32];
+    serverErrorToStr(expectedResultStr, expectedResult);
+    serverErrorToStr(actualResultStr, actualResult);
+    printf(
+        "Tester Name: \"%s\"\n"
+        "Function Name: %s\n"
+        "Test Case: %s\n"
+        "Input Data: %s\n"
+        "Expected Result: %s\n"
+        "Actual Result: %s\n\n",
+        testerName, 
+        FunctionName,
+        testCase,
+        inputData,
+        expectedResultStr,
+        actualResultStr
+        );
+}

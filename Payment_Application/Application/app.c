@@ -164,7 +164,7 @@ void appStart(){
 
     if(isCardExpired(card, terminal) == EXPIRED_CARD){
         //printCardInfo(newCard);
-        printf("\nTERMINAL: EXPIRED_CARD[Card:%s ,Now: %s]!\n", 
+        printf("\nTERMINAL: EXPIRED_CARD[Card:%s, Now: %s]!\n", 
         card.cardExpirationDate, terminal.transactionDate);
         exit(0);
     }

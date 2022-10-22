@@ -26,54 +26,114 @@ task: Implement the server module.
 int accountsDBIndex = 0;
 
 ST_accountsDB_t accountsDB[ACCOUNTS_DB_SIZE + 1] = {
-    {.primaryAccountNumber = "1111111111111111", .balance = 50000}, // case 1
-    {.primaryAccountNumber = "2222222222222222", .balance = 50000}, // case 2
-    {.primaryAccountNumber = "3333333333333333", .balance = 3000},  // case 3   
-    {.primaryAccountNumber = "4444444444444444", .balance = 1000}   // case 4
-    }; 
+    {
+        .primaryAccountNumber = "1111111111111111", 
+        .balance = 40000,
+        .state = RUNNING
+    }, // case 1
+    
+    {
+        .primaryAccountNumber = "2222222222222222", 
+        .balance = 50000,
+        .state = RUNNING
+    }, // case 2
+
+    {
+        .primaryAccountNumber = "3333333333333333", 
+        .balance = 3000,
+        .state = RUNNING
+    },  // case 3  
+
+    {
+        .primaryAccountNumber = "4444444444444444", 
+        .balance = 1000,
+        .state = RUNNING
+    },   // case 4
+
+    {
+        .primaryAccountNumber = "5555555555555555555", 
+        .balance = 1000,
+        .state = RUNNING
+    },   // case 5
+
+    {
+        .primaryAccountNumber = "6666666666666666", 
+        .balance = 1000,
+        .state = RUNNING
+    },   // case 6
+
+    {
+        .primaryAccountNumber = "7777777777777777777", 
+        .balance = 1000,
+        .state = RUNNING
+    },   // case 7
+
+    {
+        .primaryAccountNumber = "8888888888888888", 
+        .balance = 1000,
+        .state = RUNNING
+    },   // case 8
+
+    {
+        .primaryAccountNumber = "9999999999999999999", 
+        .balance = 1000,
+        .state = RUNNING
+    },   // case 9
+
+    {
+        .primaryAccountNumber = "1212121212121212", 
+        .balance = 1000,
+        .state = RUNNING
+    }   // case 10
+}; 
 
 ST_transaction_t transactionsDB[TRANSACTIONS_DB_SIZE + 1] = {0};
 
-
 EN_transState_t recieveTransactionData(ST_transaction_t *transData){
-    if(isValidAccount(&transData->cardHolderData) == SERVER_OK){
-        if(isAmountAvailable(&transData->terminalData) == SERVER_OK){
-            transData->transState = APPROVED;
-        }
-        else{
-            transData->transState = DECLINED_INSUFFECIENT_FUND;
-        }
-    }
-    else{
-        transData->transState = DECLINED_STOLEN_CARD;
-    }
+    ST_accountsDB_t accountRefrence;
 
+    if(!(isValidAccount(&transData->cardHolderData, &accountRefrence) == SERVER_OK))
+        transData->transState = FRAUD_CARD;
+    else{    
+        if(!(isBlockedAccount(&accountRefrence) == SERVER_OK))
+            transData->transState = DECLINED_STOLEN_CARD;
+        else{
+            if(!(isAmountAvailable(&transData->terminalData, &accountRefrence) == SERVER_OK))
+                transData->transState = DECLINED_INSUFFECIENT_FUND;
+            else{
+                transData->transState = APPROVED;
+            }
+        }
+    }
+    // save transaction anyways.
     if(saveTransaction(transData) == SERVER_OK){
         return transData->transState;
     }
-    else{
-        return INTERNAL_SERVER_ERROR;
-    }
+    return INTERNAL_SERVER_ERROR;
 }
 
-EN_serverError_t isValidAccount(ST_cardData_t *cardData){
+EN_serverError_t isValidAccount(ST_cardData_t *cardData, 
+ST_accountsDB_t *accountRefrence){ //accountreference to the whole accountsDB.
     for(int i=0; i<= ACCOUNTS_DB_SIZE; i++){
         if(strcmp(cardData->primaryAccountNumber, 
         accountsDB[i].primaryAccountNumber) == 0){
-            accountsDBIndex = i;
+            *accountRefrence = accountsDB[i];
             return SERVER_OK;
         }
     }
+    accountRefrence = NULL;
     return ACCOUNT_NOT_FOUND;
 }
 
-EN_serverError_t isAmountAvailable(ST_terminalData_t *termData){
-    if(termData->transAmount <= accountsDB[accountsDBIndex].balance){
-        return SERVER_OK;
-    }
-    else{
-        return LOW_BALANCE;
-    }  
+EN_serverError_t isBlockedAccount(ST_accountsDB_t *accountRefrence){
+    if(accountRefrence->state == RUNNING) return SERVER_OK;
+    return BLOCKED_ACCOUNT;
+}
+
+EN_serverError_t isAmountAvailable(ST_terminalData_t *termData, 
+ST_accountsDB_t *accountRefrence){
+    if(termData->transAmount <= accountRefrence->balance) return SERVER_OK;
+    return LOW_BALANCE;  
 }
 
 EN_serverError_t saveTransaction(ST_transaction_t *transData){
@@ -85,7 +145,8 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
     transactionsDB[sequenceIndex] = *transData;
     if(sequenceIndex < TRANSACTIONS_DB_SIZE - 1) sequenceIndex++;
     
-    //save data to logs.txt file.
+
+    //save data to .txt file.
     FILE *transactions_DB;
     transactions_DB = fopen(LOG_FILE_PATH, "a");
     
@@ -119,10 +180,8 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
 
         return SERVER_OK;       
     }
-    else{
-        return SAVING_FAILED;
-    }
     
+    return SAVING_FAILED;   
 }
 
 /*
@@ -152,15 +211,8 @@ EN_serverError_t getTransaction(uint32_t transactionSequenceNumber, ST_transacti
 void listSavedTransactions(void){
     for(int i = 0; i <= TRANSACTIONS_DB_SIZE; i++){
         if(transactionsDB[i].transactionSequenceNumber > 0){
-            char *transState;
-            if(transactionsDB[i].transState == APPROVED) 
-            transState = "APPROVED";
-            if(transactionsDB[i].transState == DECLINED_INSUFFECIENT_FUND) 
-            transState = "DECLINED_INSUFFECIENT_FUND";
-            if(transactionsDB[i].transState == DECLINED_STOLEN_CARD) 
-            transState = "DECLINED_STOLEN_CARD";
-            if(transactionsDB[i].transState == INTERNAL_SERVER_ERROR) 
-            transState = "INTERNAL_SERVER_ERROR";
+            char transState[BUFFER_SIZE];
+            serverTransStateToStr(transState, transactionsDB[i].transState);
 
             printf(
             "\n#########################\n"
@@ -183,7 +235,70 @@ void listSavedTransactions(void){
             transactionsDB[i].cardHolderData.cardExpirationDate
             );
         }
-        
     }
-    
+}
+
+
+// added helper functions:
+void serverErrorToStr(char *str, EN_serverError_t error){
+    switch (error)
+    {
+        case SERVER_OK:
+            strcpy(str, "SERVER_OK");
+            break;
+        case SAVING_FAILED:
+            strcpy(str, "SAVING_FAILED");
+            break;
+        case TRANSACTION_NOT_FOUND:
+            strcpy(str, "TRANSACTION_NOT_FOUND");
+            break;
+        case ACCOUNT_NOT_FOUND:
+            strcpy(str, "ACCOUNT_NOT_FOUND");
+            break;
+        case BLOCKED_ACCOUNT:
+            strcpy(str, "BLOCKED_ACCOUNT");
+            break;
+        default:
+            strcpy(str, "Unkown");
+            break;
+    }
+}
+
+void serverTransStateToStr(char *str, EN_transState_t transState){
+     switch (transState)
+    {
+        case APPROVED:
+        strcpy(str, "APPROVED");
+        break;
+        case DECLINED_INSUFFECIENT_FUND:
+            strcpy(str, "DECLINED_INSUFFECIENT_FUND");
+            break;
+        case DECLINED_STOLEN_CARD:
+            strcpy(str, "DECLINED_STOLEN_CARD");
+            break;
+        case FRAUD_CARD:
+            strcpy(str, "FRAUD_CARD");
+            break;
+        case INTERNAL_SERVER_ERROR:
+            strcpy(str, "INTERNAL_SERVER_ERROR");
+            break;
+        default:
+            strcpy(str, "Unkown");
+            break;
+    }
+}
+
+void serverAccountStateToStr(char *str, EN_accountState_t accountState){
+     switch (accountState)
+    {
+        case RUNNING:
+            strcpy(str, "RUNNING");
+            break;
+        case BLOCKED:
+            strcpy(str, "BLOCKED");
+            break;
+        default:
+            strcpy(str, "Unkown");
+            break;
+    }
 }
