@@ -13,6 +13,8 @@ Last Modification Date: 17-10-2022 Mon 17:00 PM  => Ahmed Fawzy.
 #include "../../Terminal/terminal.h"
 #include "../../Server/server.h"
 
+#define NUM_OF_TEST_CASES 
+
 void recieveTransactionDataTest(void);
 void isValidAccountTest(void);
 void isBlockedAccountTest(void);

@@ -78,6 +78,7 @@ void listSavedTransactions(void);
 
 
 // added helper functions:
+void formateTransactionInfo(ST_transaction_t *transData, char *buffer);
 void serverErrorToStr(char *str, EN_serverError_t error);
 void serverTransStateToStr(char *str, EN_transState_t error);
 void serverAccountStateToStr(char *str, EN_accountState_t error);

@@ -50,12 +50,14 @@ ST_accountsDB_t accountsDB[ACCOUNTS_DB_SIZE + 1] = {
         .state = RUNNING
     },   // case 4
 
+    /*
     {
-        .primaryAccountNumber = "5555555555555555555", 
+        .primaryAccountNumber = "555555555555555555", 
         .balance = 1000,
-        .state = RUNNING
+        .state = BLOCKED
     },   // case 5
-
+    */
+    
     {
         .primaryAccountNumber = "6666666666666666", 
         .balance = 1000,
@@ -184,62 +186,48 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
     return SAVING_FAILED;   
 }
 
-/*
-EN_serverError_t getTransaction(uint32_t transactionSequenceNumber, ST_transaction_t *transData){
-    char buffer[LINE_MAX_SIZE + 1];
-    FILE *transactions_DB;
-    transactions_DB = fopen(LOG_FILE_PATH, "r");
-    
-    if(transactions_DB != NULL){  
-        const char seperator[] = ",";  
-        while (feof(transactions_DB))
-        {
-            fgets(buffer, LINE_MAX_SIZE, transactions_DB);
-            if(atoi(strtok(buffer, seperator) == transactionSequenceNumber)){
-                fclose(transactions_DB);
-                printf("Found: %s\n", buffer);
-                return SERVER_OK;
-            } 
-        }      
-    }
-    else{
-        return SAVING_FAILED;
-    }
-}
-*/
 
 void listSavedTransactions(void){
     for(int i = 0; i <= TRANSACTIONS_DB_SIZE; i++){
         if(transactionsDB[i].transactionSequenceNumber > 0){
-            char transState[BUFFER_SIZE];
-            serverTransStateToStr(transState, transactionsDB[i].transState);
-
-            printf(
-            "\n#########################\n"
-            "Transaction Sequence Number: %d\n" 
-            "Transaction Date: %s\n"
-            "Transaction Amount: %.2f\n"
-            "Transaction State: %s\n"
-            "Terminal Max Amount: %.2f\n"
-            "Cardholder Name: \"%s\"\n"
-            "PAN: %s\n"
-            "Card Expiration Date: %s\n"
-            "#########################\n\n",
-            transactionsDB[i].transactionSequenceNumber,
-            transactionsDB[i].terminalData.transactionDate,
-            transactionsDB[i].terminalData.transAmount,
-            transState,
-            transactionsDB[i].terminalData.maxTransAmount,
-            transactionsDB[i].cardHolderData.cardHolderName,
-            transactionsDB[i].cardHolderData.primaryAccountNumber,
-            transactionsDB[i].cardHolderData.cardExpirationDate
-            );
+            char log[LOG_SIZE];
+            formateTransactionInfo(&transactionsDB[i], log);
+            printf("%s\n", log);
         }
     }
 }
 
 
 // added helper functions:
+
+void formateTransactionInfo(ST_transaction_t *transData, char *log){
+    char transState[BUFFER_SIZE];
+    serverTransStateToStr(transState, transData->transState);
+
+    //char log[LOG_SIZE];
+
+    snprintf(log, LOG_SIZE,
+    "\n#########################\n"
+    "Transaction Sequence Number: %d\n" 
+    "Transaction Date: %s\n"
+    "Transaction Amount: %.2f\n"
+    "Transaction State: %s\n"
+    "Terminal Max Amount: %.2f\n"
+    "Cardholder Name: \"%s\"\n"
+    "PAN: %s\n"
+    "Card Expiration Date: %s\n"
+    "#########################\n\n",
+    transData->transactionSequenceNumber,
+    transData->terminalData.transactionDate,
+    transData->terminalData.transAmount,
+    transState,
+    transData->terminalData.maxTransAmount,
+    transData->cardHolderData.cardHolderName,
+    transData->cardHolderData.primaryAccountNumber,
+    transData->cardHolderData.cardExpirationDate
+    );
+}
+
 void serverErrorToStr(char *str, EN_serverError_t error){
     switch (error)
     {
@@ -302,3 +290,28 @@ void serverAccountStateToStr(char *str, EN_accountState_t accountState){
             break;
     }
 }
+
+
+/*
+EN_serverError_t getTransaction(uint32_t transactionSequenceNumber, ST_transaction_t *transData){
+    char buffer[LINE_MAX_SIZE + 1];
+    FILE *transactions_DB;
+    transactions_DB = fopen(LOG_FILE_PATH, "r");
+    
+    if(transactions_DB != NULL){  
+        const char seperator[] = ",";  
+        while (feof(transactions_DB))
+        {
+            fgets(buffer, LINE_MAX_SIZE, transactions_DB);
+            if(atoi(strtok(buffer, seperator) == transactionSequenceNumber)){
+                fclose(transactions_DB);
+                printf("Found: %s\n", buffer);
+                return SERVER_OK;
+            } 
+        }      
+    }
+    else{
+        return SAVING_FAILED;
+    }
+}
+*/
