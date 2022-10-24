@@ -1,7 +1,0 @@
-{ name: "Ahmed Fawzy", pan: "1111111111111111", date: "2022-10-17 15:33:08",  balance: 45000.000000, withdraw: 5000.000000 }
-{ name: "Ahmed Fawzy", pan: "1111111111111111", date: "2022-10-17 15:33:40",  balance: 45000.000000, withdraw: 5000.000000 }
-{ name: "Ali Zein", pan: "2222222222222222", date: "2022-10-17 15:42:01",  balance: 48000.000000, withdraw: 2000.000000 }
-{ name: "Ahmed Fawzy", pan: "1111111111111111", date: "2022-10-17 16:35:41",  balance: 45000.000000, withdraw: 5000.000000 }
-{ name: "Ahmed Fawzy", pan: "1111111111111111", date: "2022-10-17 16:41:08",  balance: 45000.000000, withdraw: 5000.000000 }
-{ name: "Ahmed Fawzy", pan: "1111111111111111", date: "2022-10-17 16:41:42",  balance: 45000.000000, withdraw: 5000.000000 }
-{ name: "Ahmed Fawzy", pan: "1111111111111111", date: "2022-10-17 16:45:07",  balance: 45000.000000, withdraw: 5000.000000 }
