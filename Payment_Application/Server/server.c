@@ -61,7 +61,7 @@ ST_accountsDB_t accountsDB[ACCOUNTS_DB_SIZE + 1] = {
     {
         .primaryAccountNumber = "6666666666666666", 
         .balance = 1000,
-        .state = RUNNING
+        .state = BLOCKED
     },   // case 6
 
     {
@@ -146,8 +146,8 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
     static int sequenceIndex = 0;
     transactionsDB[sequenceIndex] = *transData;
     if(sequenceIndex < TRANSACTIONS_DB_SIZE - 1) sequenceIndex++;
-    
-
+listSavedTransactions();    
+return SERVER_OK; //<<<<<<<<<<<<<<<< test
     //save data to .txt file.
     FILE *transactions_DB;
     transactions_DB = fopen(LOG_FILE_PATH, "a");
@@ -188,6 +188,7 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
 
 
 void listSavedTransactions(void){
+    printf("TRANSACTIONS LIST:\n");
     for(int i = 0; i <= TRANSACTIONS_DB_SIZE; i++){
         if(transactionsDB[i].transactionSequenceNumber > 0){
             char log[LOG_SIZE];
@@ -207,7 +208,7 @@ void formateTransactionInfo(ST_transaction_t *transData, char *log){
     //char log[LOG_SIZE];
 
     snprintf(log, LOG_SIZE,
-    "\n#########################\n"
+    "\n#########SERVER##########\n"
     "Transaction Sequence Number: %d\n" 
     "Transaction Date: %s\n"
     "Transaction Amount: %.2f\n"

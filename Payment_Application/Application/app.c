@@ -39,7 +39,7 @@ ST_transaction_t transactionTestCases[NUM_OF_TEST_CASES + 1] = {
     .terminalData = {.transAmount = 5000} },  // case: 1
 
     {.cardHolderData = 
-    {.cardHolderName =  "Mohamed Ali Samy Ibrahim",
+    {.cardHolderName =  "Mohamed Samy Ibrahim",
     .primaryAccountNumber = "2222222222222222", 
     .cardExpirationDate = "08/26"},
     .terminalData = {.transAmount = 10000} }, // case: 2

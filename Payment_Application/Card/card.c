@@ -79,3 +79,42 @@ EN_cardError_t isValidPANFormat(char *PAN){
     }
     return CARD_OK;
 }
+
+
+// added helper functons:
+
+
+void formateCardInfo(ST_cardData_t card, char *log){
+
+    snprintf(log, CARD_LOG_SIZE,
+    "\n##########CARD###########\n"
+    "cardHolderName: %s\n"
+    "PAN: %s\n"
+    "Expiration Date: %s\n"
+    "#########################\n",
+    card.cardHolderName,
+    card.primaryAccountNumber,
+    card.cardExpirationDate
+    );
+}
+
+void cardErrorToStr(char *str, EN_cardError_t error){
+    switch (error)
+    {
+        case CARD_OK:
+            strcpy(str, "CARD_OK");
+            break;
+        case WRONG_NAME:
+            strcpy(str, "WRONG_NAME");
+            break;
+        case WRONG_EXP_DATE:
+            strcpy(str, "WRONG_EXP_DATE");
+            break;
+        case WRONG_PAN:
+            strcpy(str, "WRONG_PAN");
+            break;
+        default:
+            strcpy(str, "Unkown");
+            break;
+    }
+}

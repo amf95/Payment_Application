@@ -24,6 +24,7 @@ task: Implement the card module.
 #define EXPIRATION_DATE_SIZE 5
 #define PAN_MAX_SIZE 19
 #define PAN_MIN_SIZE 16
+#define CARD_LOG_SIZE 1024
 
 typedef struct ST_cardData_t{
     uint8_t cardHolderName[NAME_MAX_SIZE + 1];
@@ -42,5 +43,6 @@ EN_cardError_t getCardPAN(ST_cardData_t *cardData);
 //Added Helper Functions.
 EN_cardError_t isValidDateFormat(char *date);
 EN_cardError_t isValidPANFormat(char *PAN);
-
+void cardErrorToStr(char *str, EN_cardError_t error);
+void formateCardInfo(ST_cardData_t card, char *log);
 #endif

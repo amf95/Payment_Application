@@ -24,7 +24,7 @@ task: Implement the terminal module.
 
 #define BUFFER_SIZE 32
 #define TRANSACTION_DATE_SIZE 10
-
+#define TERM_LOG_SIZE 2048
 
 typedef enum EN_terminalError_t
 {
@@ -40,9 +40,13 @@ typedef struct ST_terminalData_t
 
 EN_terminalError_t getTransactionDate(ST_terminalData_t *termData);
 EN_terminalError_t isCardExpired(ST_cardData_t cardData, ST_terminalData_t termData);
-EN_terminalError_t isValidCardPAN(ST_cardData_t *cardData);
+//EN_terminalError_t isValidCardPAN(ST_cardData_t *cardData);
 EN_terminalError_t getTransactionAmount(ST_terminalData_t *termData);
 EN_terminalError_t isBelowMaxAmount(ST_terminalData_t *termData);
 EN_terminalError_t setMaxAmount(ST_terminalData_t *termData);
+
+// added helper functions:
+void termErrorToStr(char *str, EN_terminalError_t error);
+void formateTermInfo(ST_terminalData_t term, char *log);
 
 #endif

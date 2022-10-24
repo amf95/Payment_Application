@@ -15,13 +15,12 @@ void getCardHolderNameTest(void);
 void getCardExpiryDateTest(void);
 void getCardPANTest(void);
 
-//Added Helper Functions.
-void isValidDateFormatTest(void);
-void isValidPANFormatTest(void);
+//Added Helper Functions:
+
 void printCardTestCaseInfo( char *testerName, char *FunctionName,
                         char *testCase, char *inputData,
                         EN_cardError_t expectedResult, 
                         EN_cardError_t actualResult);
-void cardErrorToStr(char *str, EN_cardError_t error);
+
 
 #endif

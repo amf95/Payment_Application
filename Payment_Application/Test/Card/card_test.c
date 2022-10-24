@@ -23,209 +23,215 @@ int main(){
 }
 
 void getCardHolderNameTest(void){
-    ST_cardData_t valideNameCase = 
-    {.cardHolderName = "Ahmed Mohamed Mahmoud"}; // 21 chars > 20 & < 24.
+
+    ST_cardData_t cardData; 
+    printf("Enter: Ahmed Mohamed Mahmoud\n"); // 21 chars > 20 & < 24.
+    EN_cardError_t result = getCardHolderName(&cardData);
+    
     printCardTestCaseInfo(
         "Ahmed Mahmoud Fawzy", "getCardHolderName()", 
         "valideNameCase",
-        valideNameCase.cardHolderName,
+        "Ahmed Mohamed Mahmoud",
         CARD_OK,
-        getCardHolderName(&valideNameCase)
+        result
     );
 
-    ST_cardData_t belowMinCharsCase = 
-    {.cardHolderName = "Ahmed Mohamed fawzy"}; // 19 chars < 20.
+
+    printf("Enter: Ahmed Mohamed fawzy\n"); // 19 chars < 20.
+    result = getCardHolderName(&cardData);
+
     printCardTestCaseInfo(
         "Ahmed Mahmoud Fawzy", "getCardHolderName()", 
         "belowMinCharsCase",
-        belowMinCharsCase.cardHolderName,
+        " Ahmed Mohamed fawzy",
         WRONG_NAME,
-        getCardHolderName(&belowMinCharsCase)
+        result
     );
 
-    ST_cardData_t aboveMaxCharsCase = 
-    {.cardHolderName = "Ahmed Mohamed Mahmoud Zakey"}; // 27 chars > 24.
+
+    printf("Enter: Ahmed Mohamed Mahmoud Zakey\n"); // 27 chars > 24.
+    result = getCardHolderName(&cardData);
+
     printCardTestCaseInfo(
         "Ahmed Mahmoud Fawzy", "getCardHolderName()", 
         "aboveMaxCharsCase",
-        aboveMaxCharsCase.cardHolderName,
+        "Ahmed Mohamed Mahmoud Zakey",
         WRONG_NAME,
-        getCardHolderName(&aboveMaxCharsCase)
+        result
     );
 
-    ST_cardData_t nullCase = 
-    {.cardHolderName = NULL}; // NULL.
+    printf("Just press ENTER:\n"); 
+    result = getCardHolderName(&cardData);
+
     printCardTestCaseInfo(
         "Ahmed Mahmoud Fawzy", "getCardHolderName()", 
         "nullCase",
-        nullCase.cardHolderName,
+        "",
         WRONG_NAME,
-        getCardHolderName(&nullCase)
+        result
     );
 }
 
+
 void getCardExpiryDateTest(void){
 
-    ST_cardData_t valideDateCase = 
-    {.cardExpirationDate = "01/25"}; // Valide
+    ST_cardData_t cardData; 
+
+    printf("Enter: 01/25\n"); // Valide
+    EN_cardError_t result = getCardExpiryDate(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardExpiryDate()", 
         "valideDateCase",
-        valideDateCase.cardExpirationDate,
+        "01/25",
         CARD_OK,
-        getCardExpiryDate(&valideDateCase)
+        result
     );
 
-    ST_cardData_t expiredYearCardCase = 
-    {.cardExpirationDate = "01/21"}; 
-    printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
-        "expiredYearCardCase",
-        expiredYearCardCase.cardExpirationDate,
-        WRONG_EXP_DATE,
-        getCardExpiryDate(&expiredYearCardCase)
-    );
 
-    ST_cardData_t expiredMonthCardCase = 
-    {.cardExpirationDate = "05/22"}; 
+    printf("Enter: 7/25\n"); 
+    result = getCardExpiryDate(&cardData);
+    
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
-        "expiredMonthCardCase",
-        expiredMonthCardCase.cardExpirationDate,
-        WRONG_EXP_DATE,
-        getCardExpiryDate(&expiredMonthCardCase)
-    );
-
-    ST_cardData_t belowMinCharsCase = 
-    {.cardExpirationDate = "7/25"}; 
-    printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardExpiryDate()", 
         "belowMinCharsCase",
-        belowMinCharsCase.cardExpirationDate,
+        "7/25",
         WRONG_EXP_DATE,
-        getCardExpiryDate(&belowMinCharsCase)
+        result
     );
 
-    ST_cardData_t aboveMaxCharsCase = 
-    {.cardExpirationDate = "07/2025"}; 
+
+    printf("Enter: 07/2025\n"); 
+    result = getCardExpiryDate(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardExpiryDate()", 
         "aboveMaxCharsCase",
-        aboveMaxCharsCase.cardExpirationDate,
+        "07/2025",
         WRONG_EXP_DATE,
-        getCardExpiryDate(&aboveMaxCharsCase)
+        result
     );
 
-    ST_cardData_t wrongSeperatorCase = 
-    {.cardExpirationDate = "07-25"}; 
+
+    printf("Enter: 07-25\n"); 
+    result = getCardExpiryDate(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardExpiryDate()", 
         "wrongSeperatorCase",
-        wrongSeperatorCase.cardExpirationDate,
+        "07-25",
         WRONG_EXP_DATE,
-        getCardExpiryDate(&wrongSeperatorCase)
+        result
     );
 
-    ST_cardData_t charCase = 
-    {.cardExpirationDate = "o7/3o"}; 
+    
+    printf("Enter: o7/3o\n"); 
+    result = getCardExpiryDate(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardExpiryDate()", 
         "charCase",
-        charCase.cardExpirationDate,
+        "o7/3o",
         WRONG_EXP_DATE,
-        getCardExpiryDate(&charCase)
+        result
     );
 
-    ST_cardData_t nullCase = 
-    {.cardExpirationDate = NULL}; // NULL.
+    
+    printf("Just press ENTER:\n"); 
+    result = getCardExpiryDate(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardExpiryDateTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardExpiryDate()", 
         "nullCase",
-        nullCase.cardExpirationDate,
+        "",
         WRONG_EXP_DATE,
-        getCardExpiryDate(&nullCase)
+        result
     );
 }
 
 void getCardPANTest(void){
 
-    ST_cardData_t valideDateCase = 
-    {.primaryAccountNumber = "1111111111111111"}; // Valide 16
+    ST_cardData_t cardData; 
+
+    printf("Enter: 1111111111111111\n"); // Valide
+    EN_cardError_t result = getCardPAN(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardPANTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardPAN()", 
         "valideDateCase",
-        valideDateCase.primaryAccountNumber,
+        "1111111111111111",
         CARD_OK,
-        getCardPAN(&valideDateCase)
+        result
     );
 
 
-    ST_cardData_t belowMinCharsCase = 
-    {.primaryAccountNumber = "111111111111111"}; // 15
+    printf("Enter: 111111111111111\n"); // 15
+    result = getCardPAN(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardPANTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardPAN()", 
         "belowMinCharsCase",
-        belowMinCharsCase.primaryAccountNumber,
-        WRONG_EXP_DATE,
-        getCardPAN(&belowMinCharsCase)
+        "111111111111111",
+        WRONG_PAN,
+        result
     );
 
-    ST_cardData_t aboveMaxCharsCase = 
-    {.primaryAccountNumber = "11111111111111111111"}; // 20
+
+    printf("Enter: 11111111111111111111\n"); // 20
+    result = getCardPAN(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardPANTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardPAN()", 
         "aboveMaxCharsCase",
-        aboveMaxCharsCase.primaryAccountNumber,
-        WRONG_EXP_DATE,
-        getCardPAN(&aboveMaxCharsCase)
+        "11111111111111111111",
+        WRONG_PAN,
+        result
     );
 
-    ST_cardData_t charCase = 
-    {.primaryAccountNumber = "1111111i111111"}; 
+
+    printf("Enter: 1111111i11111111\n"); // i char
+    result = getCardPAN(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardPANTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardPAN()", 
         "charCase",
-        charCase.primaryAccountNumber,
-        WRONG_EXP_DATE,
-        getCardPAN(&charCase)
+        "1111111i11111111",
+        WRONG_PAN,
+        result
     );
 
-    ST_cardData_t nullCase = 
-    {.primaryAccountNumber = NULL}; // NULL.
+
+    printf("Just press ENTER:\n"); // NULL
+    result = getCardPAN(&cardData);
+
     printCardTestCaseInfo(
-        "Ahmed Mahmoud Fawzy", "getCardPANTest()", 
+        "Ahmed Mahmoud Fawzy", "getCardPAN()", 
         "nullCase",
-        nullCase.primaryAccountNumber,
-        WRONG_EXP_DATE,
-        getCardPAN(&nullCase)
+        "",
+        WRONG_PAN,
+        result
     );
 }
 
-//Added Helper Functions.
-void isValidDateFormatTest(void){
-
-}
-
-void isValidPANFormatTest(void){
-    
-}
-
+//Added Helper Functions:
 
 void printCardTestCaseInfo( char *testerName, char *FunctionName,
                         char *testCase, char *inputData,
                         EN_cardError_t expectedResult, 
                         EN_cardError_t actualResult){
-printf("\n\ndump\n\n");
+                            
     char expectedResultStr[32], actualResultStr[32];
     cardErrorToStr(expectedResultStr, expectedResult);
     cardErrorToStr(actualResultStr, actualResult);
     printf(
+        "---------------------------------\n"
         "Tester Name: \"%s\"\n"
         "Function Name: %s\n"
         "Test Case: %s\n"
         "Input Data: %s\n"
         "Expected Result: %s\n"
-        "Actual Result: %s\n\n",
+        "Actual Result: %s\n\n"
+        "---------------------------------\n",
         testerName, 
         FunctionName,
         testCase,
@@ -235,22 +241,3 @@ printf("\n\ndump\n\n");
         );
 }
 
-void cardErrorToStr(char *str, EN_cardError_t error){
-    switch (error)
-    {
-    case CARD_OK:
-        strcpy(str, "CARD_OK");
-        break;
-    case WRONG_NAME:
-        strcpy(str, "WRONG_NAME");
-        break;
-    case WRONG_EXP_DATE:
-        strcpy(str, "WRONG_EXP_DATE");
-        break;
-    case WRONG_PAN:
-        strcpy(str, "WRONG_PAN");
-        break;
-    default:
-        break;
-    }
-}

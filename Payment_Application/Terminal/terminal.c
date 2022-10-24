@@ -86,6 +86,48 @@ EN_terminalError_t setMaxAmount(ST_terminalData_t *termData){
     return INVALID_MAX_AMOUNT;
 }
 
+// added helper functons:
 
+void formateTermInfo(ST_terminalData_t term, char *log){
 
+    snprintf(log, TERM_LOG_SIZE,
+    "\n##########TERM###########\n"
+    "Trans Amount: %.2f\n"
+    "Transaction Date: %s\n"
+    "Max Trans Amount: %.2f\n"
+    "#########################\n",
+    term.transAmount,
+    term.transactionDate,
+    term.maxTransAmount
+    );
+}
 
+void termErrorToStr(char *str, EN_terminalError_t error){
+    switch (error)
+    {
+        case TERM_OK:
+            strcpy(str, "TERM_OK");
+            break;
+        case WRONG_DATE:
+            strcpy(str, "WRONG_DATE");
+            break;
+        case EXPIRED_CARD:
+            strcpy(str, "EXPIRED_CARD");
+            break;
+        case INVALID_CARD:
+            strcpy(str, "INVALID_CARD");
+            break;
+        case INVALID_AMOUNT:
+            strcpy(str, "INVALID_AMOUNT");
+            break;
+        case EXCEED_MAX_AMOUNT:
+            strcpy(str, "EXCEED_MAX_AMOUNT");
+            break;
+        case INVALID_MAX_AMOUNT:
+            strcpy(str, "INVALID_MAX_AMOUNT");
+            break;
+        default:
+            strcpy(str, "Unkown");
+            break;
+    }
+}
