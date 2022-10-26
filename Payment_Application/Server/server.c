@@ -104,6 +104,7 @@ EN_transState_t recieveTransactionData(ST_transaction_t *transData){
                 transData->transState = DECLINED_INSUFFECIENT_FUND;
             else{
                 transData->transState = APPROVED;
+                accountsDB[accountsDBIndex].balance -= transData->terminalData.transAmount;
             }
         }
     }
@@ -120,6 +121,7 @@ ST_accountsDB_t *accountRefrence){ //accountreference to the whole accountsDB.
         if(strcmp(cardData->primaryAccountNumber, 
         accountsDB[i].primaryAccountNumber) == 0){
             *accountRefrence = accountsDB[i];
+            accountsDBIndex = i;
             return SERVER_OK;
         }
     }
@@ -146,8 +148,8 @@ EN_serverError_t saveTransaction(ST_transaction_t *transData){
     static int sequenceIndex = 0;
     transactionsDB[sequenceIndex] = *transData;
     if(sequenceIndex < TRANSACTIONS_DB_SIZE - 1) sequenceIndex++;
-listSavedTransactions();    
-return SERVER_OK; //<<<<<<<<<<<<<<<< test
+//listSavedTransactions();    
+//return SERVER_OK; //<<<<<<<<<<<<<<<< test
     //save data to .txt file.
     FILE *transactions_DB;
     transactions_DB = fopen(LOG_FILE_PATH, "a");
@@ -162,10 +164,11 @@ return SERVER_OK; //<<<<<<<<<<<<<<<< test
 
         //manage data formate. 
         snprintf(log, LOG_SIZE, 
-            "%d,%s,%f,%d,%.2f,%s,%s,%s\n",
+            "%d,%s,%f,%f,%d,%.2f,%s,%s,%s\n",
             transData->transactionSequenceNumber,
             transData->terminalData.transactionDate,
             transData->terminalData.transAmount,
+            accountsDB[accountsDBIndex].balance,
             transData->transState,
             transData->terminalData.maxTransAmount,
             transData->cardHolderData.cardHolderName,
@@ -211,7 +214,9 @@ void formateTransactionInfo(ST_transaction_t *transData, char *log){
     "\n#########SERVER##########\n"
     "Transaction Sequence Number: %d\n" 
     "Transaction Date: %s\n"
-    "Transaction Amount: %.2f\n"
+    "Balance Before Transaction: %.2f\n"
+    "Transaction Amount(Withdraw): %.2f\n"
+    "Balance After Transaction: %.2f\n"
     "Transaction State: %s\n"
     "Terminal Max Amount: %.2f\n"
     "Cardholder Name: \"%s\"\n"
@@ -220,7 +225,9 @@ void formateTransactionInfo(ST_transaction_t *transData, char *log){
     "#########################\n\n",
     transData->transactionSequenceNumber,
     transData->terminalData.transactionDate,
+    accountsDB[accountsDBIndex].balance + transData->terminalData.transAmount,
     transData->terminalData.transAmount,
+    accountsDB[accountsDBIndex].balance,
     transState,
     transData->terminalData.maxTransAmount,
     transData->cardHolderData.cardHolderName,
