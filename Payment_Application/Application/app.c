@@ -25,7 +25,7 @@ task: Testing the application
 #include <stdlib.h>
 #include <string.h>
 
-#define NUM_OF_TEST_CASES 5
+#define NUM_OF_TEST_CASES 6
 
 ST_cardData_t card;
 ST_terminalData_t terminal;
@@ -64,6 +64,13 @@ ST_transaction_t transactionTestCases[NUM_OF_TEST_CASES + 1] = {
     .cardExpirationDate = "05/28"},
     .terminalData = {.transAmount = 1000} 
     }, // case: 5
+
+    {.cardHolderData = 
+    {.cardHolderName =  "Saeid Ahmed Saad Sayed",
+    .primaryAccountNumber = "6666666666666666", 
+    .cardExpirationDate = "05/28"},
+    .terminalData = {.transAmount = 1000} 
+    }, // case: 6
 };
     
 char testCases[NUM_OF_TEST_CASES + 1][50] = {
@@ -71,7 +78,8 @@ char testCases[NUM_OF_TEST_CASES + 1][50] = {
     "2-Exceed the maximum amount user story",
     "3-Insufficient fund user story",
     "4-Expired card user story",
-    "5-Invalid card user story"
+    "5-Invalid card user story",
+    "6-Bloced User story"
 };
 
 
@@ -149,6 +157,10 @@ void appStart(){
             "Invalid card user story");
             break;       
 
+        case 6:
+            loadTestValues(&card, &terminal,  transactionTestCases[mode-1],
+            "Blocked user story");
+            break;
         default:
             printf("\nWrong Case!\n");
             exit(0);
