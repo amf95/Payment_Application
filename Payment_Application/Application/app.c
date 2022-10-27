@@ -222,7 +222,9 @@ void appStart(){
     case INTERNAL_SERVER_ERROR:
         printf("\nSERVER: INTERNAL_SERVER_ERROR!\n\n");
         break;
-
+    case FRAUD_CARD:
+        printf("\nSERVER: FRAUD_CARD!\n\n");
+        break;
     default:
         break;
     }

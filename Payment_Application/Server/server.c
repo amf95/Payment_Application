@@ -208,8 +208,22 @@ void formateTransactionInfo(ST_transaction_t *transData, char *log){
     char transState[BUFFER_SIZE];
     serverTransStateToStr(transState, transData->transState);
 
-    //char log[LOG_SIZE];
+    float balanceAfterTransaction = 0.0;
 
+    if(transData->transState == APPROVED){
+    balanceAfterTransaction = 
+    accountsDB[accountsDBIndex].balance + transData->terminalData.transAmount;
+    }
+    else if(transData->transState == DECLINED_INSUFFECIENT_FUND){
+        balanceAfterTransaction = accountsDB[accountsDBIndex].balance;
+    }
+    else if(transData->transState == FRAUD_CARD 
+    || transData->transState == DECLINED_STOLEN_CARD){
+        balanceAfterTransaction = 0.0;
+        accountsDB[accountsDBIndex].balance = 0;
+    }
+    //char log[LOG_SIZE];
+    
     snprintf(log, LOG_SIZE,
     "\n#########SERVER##########\n"
     "Transaction Sequence Number: %d\n" 
@@ -225,7 +239,7 @@ void formateTransactionInfo(ST_transaction_t *transData, char *log){
     "#########################\n\n",
     transData->transactionSequenceNumber,
     transData->terminalData.transactionDate,
-    accountsDB[accountsDBIndex].balance + transData->terminalData.transAmount,
+    balanceAfterTransaction,
     transData->terminalData.transAmount,
     accountsDB[accountsDBIndex].balance,
     transState,
